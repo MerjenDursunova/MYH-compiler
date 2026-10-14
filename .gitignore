@@ -1,0 +1,17 @@
+# Build artifacts
+myh
+test
+*.o
+*.out
+*.class
+__pycache__/
+*.pyc
+
+# OS / editor junk
+.DS_Store
+.vscode/
+__MACOSX/
+
+# Python venvs
+gramenv/
+venv/

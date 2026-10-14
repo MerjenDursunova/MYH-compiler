@@ -1,0 +1,96 @@
+program:
+    "int main() { int a = 1+2; return 0; }" -> OK
+    "int main() { return 0; }" -> OK
+    "int add(int x, int y) { return x+y; } int main() { return 0; }" -> OK
+    "int global = 42; int main() { return global; }" -> OK
+    "const int SIZE = 10; int arr[SIZE]; int main() { return 0; }" -> OK
+    "int x = 5; int main() { x = 10; return 0; }" -> OK
+    "if (1) { }" -> FAIL
+    "while (1) { }" -> FAIL
+
+declaration:
+    "int a = 5;" -> OK
+    "int b = 1+2*3;" -> OK
+    "const int c = 10;" -> OK
+    "int d;" -> OK
+    "int e = 5, f = 6, g = 7;" -> OK
+    "int arr[5];" -> OK
+    "int matrix[3][4];" -> OK
+    "int unknown[] = {1,2,3};" -> OK
+    "int bad[][5];" -> FAIL
+    "int arr[5] = {1,2,3,4,5};" -> OK
+    "int nested[2][3] = {{1,2,3},{4,5,6}};" -> OK
+    "const int x = 5 % 3, C[9/4] = {2 * 6 / 4, 2 + 6 % 4}, y = 5;" -> OK
+    "int = 5;" -> FAIL
+    "int a = ;" -> FAIL
+    "const int x; int main() { x = 5; return 0; }" -> OK
+    "int a[][];" -> FAIL
+
+assignment:
+    "int main() { int x; x = 42; return 0; }" -> OK
+    "int main() { int arr[5]; arr[0] = 10; return 0; }" -> OK
+    "int main() { int matrix[2][2]; matrix[0][0] = 99; return 0; }" -> OK
+    "int main() { = 42; return 0; }" -> FAIL
+    "int main() { int x; x = ; return 0; }" -> FAIL
+
+ifStmt:
+    "int main() { int x = 1; if (x > 0) { return 1; } return 0; }" -> OK
+    "int main() { int x = 1; if (x > 0) return 1; else return 0; }" -> OK
+    "int main() { int x = 1, y = 2; if (x > 0) if (y > 0) return 2; else return 1; return 0; }" -> OK
+
+whileStmt:
+    "int main() { int i = 0; while (i < 10) { i = i + 1; } return 0; }" -> OK
+    "while (1) { }" -> FAIL
+
+forStmt:
+    "int main() { for (int i = 0; i < 10; i = i + 1) { } return 0; }" -> OK
+    "int main() { int i; for (i = 0; i < 10; i = i + 1) { } return 0; }" -> OK
+    "int main() { int i; for ( ; i < 10; i = i + 1) { } return 0; }" -> OK
+    "int main() { int i; for ( ; ; i = i + 1) { if (i > 5) break; } return 0; }" -> FAIL
+    "int main() { for (int i = 0; i < 10; ) { i = i + 1; } return 0; }" -> OK
+    "int main() { for (int i = 0; i < 10; i = i + 1, j = j - 1) { } return 0; }" -> FAIL
+
+returnStmt:
+    "int main() { return 5; }" -> OK
+    "int main() { return 5+3*2; }" -> OK
+    "int main() { return ; }" -> FAIL
+
+expr:
+    "int main() { int x = 1+2; return x; }" -> OK
+    "int main() { int x = 1+2*3; return x; }" -> OK
+    "int main() { int x = (1+2)*3; return x; }" -> OK
+    "int main() { int x = 5 % 3; return x; }" -> OK
+    "int main() { int x = 5 % 3 + 2; return x; }" -> OK
+    "int main() { int a=1, b=2, c=3, d=4; int x = a < b && c > d; return x; }" -> OK
+    "int main() { int a=1, b=2, c=3, d=4; int x = a == b || c != d; return x; }" -> OK
+    "int main() { int a=1, b=0; int x = !a && b; return x; }" -> OK
+    "int main() { int a=1, b=2; int x = -(a+b); return x; }" -> OK
+    "int main() { int x = 1++2; return x; }" -> FAIL
+    "int foo(int a, int b) { return a+b; } int main() { return foo(1,2+3); }" -> OK
+    "int main() { int arr[2][3]; int x = arr[1+2][3]; return 0; }" -> OK
+    "int main() { int arr[][5]; return 0; }" -> FAIL
+
+block:
+    "int main() { { int a = 5; } return 0; }" -> OK
+    "int main() { int x = 0, y = 1; if (x) { { { y = 1; } } } return y; }" -> OK
+
+type:
+    "float x = 5.0;" -> FAIL
+    "char c = 'a';" -> FAIL
+
+lexer:
+    "int main() { int h = 0xFF; return 0; }" -> OK
+    "int main() { int o = 0755; return 0; }" -> OK
+    "int main() { int d = 123; return 0; }" -> OK
+    "int main() { int b = 0b1010; return 0; }" -> FAIL
+    "int if = 5;" -> FAIL
+    "int return = 0;" -> FAIL
+    "int main() { // comment\n return 0; }" -> OK
+    "int main() { return 0; } // end" -> OK
+
+complex:
+    "int fact(int n) { if (n <= 1) return 1; else return n * fact(n-1); } int main() { return fact(5); }" -> OK
+    "int main() { int sum = 0; int i = 0; int arr[5] = {1,2,3,4,5}; while (i < 5) { sum = sum + arr[i]; i = i + 1; } return sum; }" -> OK
+    "int main() { int i, j; for (i = 0; i < 10; i = i + 1) { for (j = 0; j < 10; j = j + 1) { } } return 0; }" -> OK
+    "int main() { return 0 }" -> FAIL
+    "int a = 5" -> FAIL
